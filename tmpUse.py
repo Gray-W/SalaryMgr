@@ -1,5 +1,5 @@
 import xlsxwriter
-
+import datetime
 
 
 def _readline(f):
@@ -18,9 +18,10 @@ def _caculateDaySalary(countList, ratio):
     return round(daySalary, 1), haveDayWork
 
 def main():
-    payroll = xlsxwriter.Workbook('工资表.xlsx')
+    dt = datetime.datetime.now()
+    payroll = xlsxwriter.Workbook('%s-%s-%s工资表.xlsx' % (dt.year, dt.month, dt.day))
 
-    with open('monthOutput.txt', 'r', encoding='utf8') as f:
+    with open('月工资输入.txt', 'r', encoding='utf8') as f:
         dataList = _readline(f)
         while True:
             if not dataList or not dataList[0]:
@@ -59,6 +60,7 @@ def main():
                 workSheet.write_row('A%s' % (day+1), dataList)
                 day += 1
         payroll.close()
+
 
 if __name__ == '__main__':
     main()
