@@ -3,8 +3,8 @@ import datetime
 
 
 def _readline(f):
-    myList = f.readline().strip().split(' ')
-    return myList
+    countList = f.readline().strip().split(' ')
+    return countList
 
 def _caculateDaySalary(countList, ratio):
     daySalary = 0
@@ -31,13 +31,23 @@ def main():
     })
     ALLSALARY = {}  # NAME:SALARY
 
-    with open('月工资输入.txt', 'r', encoding='utf8') as f:
+    with open('在这输入工资.txt', 'r', encoding='utf8') as f:
         # 读取带名字首行
+        fileLinesNum = len(f.readlines())
+        f.seek(0)
         dataList = _readline(f)
+        curLine = 1
+
         while True:
-            if not dataList or not dataList[0]:
-                print('读完了！（没读完的话检查是否有空行！！！）')
+            # if not dataList or not dataList[0]:
+            #     print('读完了！（没读完的话检查是否有空行！！！）')
+            #     break
+            if curLine == fileLinesNum:
                 break
+            if not dataList or not dataList[0]:
+                dataList = _readline(f)
+                curLine += 1
+                continue
             if dataList[0].isdigit():
                 print('数据错误')
                 break
@@ -47,10 +57,11 @@ def main():
             day = 1
             workSheet = payroll.add_worksheet(name)
             workSheet.set_column('B:H', 15)  # 设置列宽
-            headings = ['id', '计件', '计件', '计件', '计件', '计件', '日工(小时)', '工资(元)']
+            headings = ['id', '计件', '计件', '计件', '计件', '计件', '日工', '工资(元)']
 
             while True:  # 日工资
                 dataList = _readline(f)
+                curLine += 1
                 if dataList[0].isalpha() or not dataList[0]:  # 计算完一个人的工资，循环退出，打印总工资
                     print('------------------------------', name, ": ", "总工资：", totalSalary, '----------------------------------------------------')
                     print()
@@ -81,7 +92,7 @@ def main():
         # 写总表
         workSheet = payroll.add_worksheet('总表')
         workSheet.set_column('A:B', 15)
-        HEAD = ['姓名', '月工资']
+        HEAD = ['姓名', '本月工资']
         workSheet.write_row('A1', HEAD, bold)
         index = 1
         for i, name in enumerate(ALLSALARY):
@@ -90,12 +101,23 @@ def main():
 
         workSheet.write('A%s' % (index+1), '总工资：', bold)
         workSheet.write_formula('B%s' % (index+1), '=SUM(B2:B%s)' % index, bold)
+
         payroll.close()
 
 
 if __name__ == '__main__':
-    main()
-    # input('输任意键关闭窗口，直接关也行！')
+    try:
+        main()
+    except Exception as e:
+        print('-------------------错误开始-----------------------')
+        print('内容：', e)
+
+        # if e.text:
+        #     print('提示: 有错误空格，行: %s' % e.text)
+
+        print('-------------------错误结束-----------------------')
+
+    input('输任意键关闭窗口，直接关也行！')
 
 
 
